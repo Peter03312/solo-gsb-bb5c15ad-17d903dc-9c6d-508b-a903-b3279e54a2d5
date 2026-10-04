@@ -1,0 +1,28 @@
+services:
+  museum:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: museum-chronicle:latest
+    container_name: museum-chronicle
+    ports:
+      - "8000:8000"
+    volumes:
+      # SQLite database + uploaded audio/transcripts persist here.
+      - museum-data:/data
+    environment:
+      DATA_DIR: /data
+      STATIC_DIR: /app/static
+      PORT: "8000"
+      # Maximum size of a single uploaded file, in megabytes.
+      MAX_UPLOAD_MB: "512"
+      WEB_CONCURRENCY: "1"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  museum-data:

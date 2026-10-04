@@ -1,0 +1,15 @@
+services:
+  workbench:
+    build: .
+    image: oral-history-workbench:latest
+    container_name: oral-history-workbench
+    ports:
+      - "8000:8000"
+    volumes:
+      # 持久化 SQLite 数据库与上传文件；首次启动自动建表初始化
+      - ./data:/data
+    environment:
+      # 可按需调整上传上限
+      MAX_AUDIO_BYTES: "209715200"      # 200MB
+      MAX_TRANSCRIPT_BYTES: "5242880"   # 5MB
+    restart: unless-stopped
